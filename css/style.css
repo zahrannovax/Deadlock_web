@@ -332,6 +332,7 @@ ul {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
   height: var(--header-height);
   gap: 16px;
 }
@@ -357,12 +358,21 @@ ul {
 }
 
 .nav-links {
+  /* Absolutely centered on the header's true midpoint (not just the gap
+     between .brand and .nav-cta), so an unevenly-weighted right-side
+     cluster (Discord button + language switcher + Purchase button)
+     doesn't visually drag the links off-center. */
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
   gap: 28px;
   list-style: none;
   margin: 0;
   padding: 0;
+  white-space: nowrap;
 }
 
 .nav-links a {
@@ -374,6 +384,16 @@ ul {
 .nav-links a.active,
 .nav-links a:hover {
   color: var(--text-main);
+}
+
+/* Wraps .nav-links + .nav-cta together. On desktop it's transparent to
+   layout (display: contents) so .nav-links stays truly centered and
+   .nav-cta stays pinned right, exactly as if this wrapper didn't exist.
+   On mobile it becomes the single dropdown panel — see the 860px
+   breakpoint below — so nav links, Discord, language and Purchase Now
+   all live in one scrollable menu instead of squeezing into one row. */
+.nav-menu {
+  display: contents;
 }
 
 .nav-cta {
@@ -2228,8 +2248,11 @@ table.compare tr:last-child td {
 }
 
 @media (max-width: 860px) {
-  .nav-links,
-  .nav-cta .btn-secondary {
+  /* Collapsed top bar: just the logo + hamburger. Nav links, Discord,
+     language switcher and Purchase Now all move into the single
+     slide-down .nav-menu panel (opened via .nav.is-open) instead of
+     squeezing into one cramped row. */
+  .nav-menu {
     display: none;
   }
 
@@ -2237,35 +2260,56 @@ table.compare tr:last-child td {
     display: flex;
   }
 
-  .nav-cta {
-    gap: 8px;
-  }
-
-  .lang-switcher-current {
-    display: none;
-  }
-
-  .lang-switcher-btn {
-    padding: 0 10px;
-  }
-
-  .lang-switcher-menu {
-    right: -8px;
-    width: min(92vw, 372px);
-  }
-
-  .nav.is-open .nav-links {
+  .nav.is-open .nav-menu {
     display: flex;
+    flex-direction: column;
     position: absolute;
     top: var(--header-height);
     left: 0;
     right: 0;
+    max-height: calc(100vh - var(--header-height));
+    overflow-y: auto;
     background-color: var(--bg-main);
     border-bottom: 1px solid var(--border-color);
+  }
+
+  .nav.is-open .nav-links {
+    position: static;
+    transform: none;
+    display: flex;
+    width: 100%;
     flex-direction: column;
     align-items: flex-start;
-    padding: 20px;
-    gap: 18px;
+    padding: 20px 20px 12px;
+    gap: 16px;
+    white-space: normal;
+  }
+
+  .nav.is-open .nav-cta {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    padding: 12px 20px 20px;
+    gap: 14px;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .nav.is-open .nav-cta .lang-switcher,
+  .nav.is-open .nav-cta .lang-switcher-btn,
+  .nav.is-open .nav-cta .btn-primary {
+    width: 100%;
+  }
+
+  .nav.is-open .nav-cta .lang-switcher-btn,
+  .nav.is-open .nav-cta .btn-primary {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .lang-switcher-menu {
+    right: auto;
+    left: 0;
+    width: 100%;
   }
 
   .grid-3,
