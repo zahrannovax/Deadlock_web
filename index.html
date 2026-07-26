@@ -20,7 +20,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=9">
+  <link rel="stylesheet" href="/css/style.css?v=10">
+
+  <!-- Smooth-scroll library (Lenis) — adds eased, momentum-style scrolling
+       instead of the browser's default instant/linear scroll. Loaded from
+       a CDN so it needs no build step; see js/main.js initSmoothScroll(). -->
+  <link rel="stylesheet" href="https://unpkg.com/lenis@1.3.25/dist/lenis.css">
+  <!-- Enables the native View Transitions API for full-page (cross-document)
+       navigations, so moving between pages cross-fades smoothly instead of
+       a hard, instant page swap. Supported in Chromium browsers; ignored
+       harmlessly everywhere else (progressive enhancement). -->
+  <meta name="view-transition" content="same-origin">
 
   <script type="application/ld+json">
   {
@@ -671,6 +681,7 @@
   </script>
   <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
 
-  <script src="/js/main.js?v=9"></script>
+  <script src="https://unpkg.com/lenis@1.3.25/dist/lenis.min.js"></script>
+  <script src="/js/main.js?v=10"></script>
 </body>
 </html>

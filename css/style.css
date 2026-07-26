@@ -38,6 +38,28 @@ html {
   scroll-behavior: smooth;
 }
 
+/* -------------------------------------------------------------------------
+   Page transitions (native View Transitions API, enabled via the
+   <meta name="view-transition" content="same-origin"> tag in <head>).
+   Cross-fades the old page out and the new page in on same-origin
+   navigations (Chromium browsers only — unsupported browsers just keep
+   their normal, instant navigation with no error). Paired with Lenis
+   (see js/main.js initSmoothScroll) for eased in-page scrolling.
+   ------------------------------------------------------------------------- */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.32s;
+  animation-timing-function: ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
 body {
   position: relative;
   margin: 0;

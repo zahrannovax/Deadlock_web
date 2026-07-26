@@ -10,7 +10,47 @@ document.addEventListener("DOMContentLoaded", function () {
   initNewsletterForm();
   initTiltCards();
   initLanguageSwitcher();
+  initSmoothScroll();
 });
+
+/**
+ * Wires up Lenis (loaded from a CDN in <head>) for eased, momentum-style
+ * scrolling instead of the browser's instant/linear scroll. Skipped
+ * entirely for users who prefer reduced motion, and fails silently if the
+ * Lenis script hasn't loaded (e.g. blocked by an ad-blocker/offline) so
+ * the page still scrolls normally either way.
+ */
+function initSmoothScroll() {
+  var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (prefersReducedMotion || typeof window.Lenis !== "function") {
+    return;
+  }
+
+  var lenis = new window.Lenis({
+    duration: 1.1,
+    smoothWheel: true,
+    autoRaf: true
+  });
+
+  // Keep the nav's language dropdown, Discord popovers, etc. in sync while
+  // the page eases to an anchor link (e.g. the hero's "See preview images"
+  // pill) instead of jumping instantly past it.
+  document.querySelectorAll('a[href^="#"]').forEach(function (link) {
+    link.addEventListener("click", function (event) {
+      var targetId = link.getAttribute("href");
+      if (!targetId || targetId === "#") {
+        return;
+      }
+      var target = document.querySelector(targetId);
+      if (!target) {
+        return;
+      }
+      event.preventDefault();
+      lenis.scrollTo(target, { offset: -84 });
+    });
+  });
+}
 
 /**
  * Toggles the mobile navigation menu.
