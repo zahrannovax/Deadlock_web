@@ -1,0 +1,15 @@
+### Cloudflare Pages caching rules.
+### Static assets are cache-busted manually (css/js via a ?v= query string,
+### images via re-numbered filenames when replaced), so it's safe to cache
+### them aggressively at the edge and in visitors' browsers. HTML documents
+### are intentionally left on Cloudflare Pages' default no-cache behaviour
+### so every deploy shows up immediately without a manual cache purge.
+
+/css/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/js/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
