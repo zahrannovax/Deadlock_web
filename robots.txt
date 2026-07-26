@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.zadeyo-deadlock.com/sitemap.xml
+Sitemap: https://deadlockcheats.net/sitemap.xml

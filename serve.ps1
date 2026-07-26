@@ -10,6 +10,12 @@ while ($listener.IsListening) {
     $path = $request.Url.LocalPath
     if ($path -eq "/") { $path = "/index.html" }
     $filePath = Join-Path $root ($path.TrimStart("/"))
+    if (-not (Test-Path $filePath -PathType Leaf) -and [System.IO.Path]::GetExtension($filePath) -eq "") {
+        # Clean-URL fallback: "/blog" -> "blog.html", mirroring the sitemap's
+        # extension-less URLs so local testing matches production routing.
+        $candidate = "$filePath.html"
+        if (Test-Path $candidate -PathType Leaf) { $filePath = $candidate }
+    }
     if (Test-Path $filePath -PathType Leaf) {
         $ext = [System.IO.Path]::GetExtension($filePath)
         $contentType = switch ($ext) {

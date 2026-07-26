@@ -1,0 +1,9 @@
+{
+  "name": "zadeyo-deadlock-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static HTML/CSS/vanilla-JS marketing site for Zadeyo Deadlock cheats. No framework, no bundler, no runtime dependencies.",
+  "scripts": {
+    "build:sitemap": "node build-sitemap.js"
+  }
+}
