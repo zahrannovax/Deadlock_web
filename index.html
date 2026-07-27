@@ -22,7 +22,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=12">
+  <!-- The hero background is a CSS background-image, so the browser can't
+       discover it until style.css has downloaded and parsed. Preloading it
+       here lets the fetch start immediately, in parallel with the CSS,
+       instead of waiting — this is the site's LCP element. -->
+  <link rel="preload" as="image" href="/assets/hero-bg.webp" fetchpriority="high">
+  <link rel="stylesheet" href="/css/style.css?v=13">
 
   <!-- Smooth-scroll library (Lenis) — adds eased, momentum-style scrolling
        instead of the browser's default instant/linear scroll. Loaded from
