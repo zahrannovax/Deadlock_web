@@ -1442,6 +1442,7 @@ body {
 }
 
 .hero-panel-content .accent-text {
+  display: block;
   color: var(--accent-primary);
 }
 
