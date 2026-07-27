@@ -2287,6 +2287,15 @@ table.compare tr:last-child td {
     border-bottom: 1px solid var(--border-color);
   }
 
+  /* Locks the page in place while the dropdown is open. Without this, the
+     sticky header (and the dropdown hanging off it) stay pinned to the
+     viewport while the page underneath keeps scrolling, so its solid
+     background looks like a blank void you have to scroll through before
+     real content reappears beneath it. */
+  body.nav-menu-open {
+    overflow: hidden;
+  }
+
   .nav.is-open .nav-links {
     position: static;
     transform: none;

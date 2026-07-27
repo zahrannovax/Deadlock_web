@@ -66,6 +66,11 @@ function initMobileNav() {
   toggle.addEventListener("click", function () {
     var isOpen = nav.classList.toggle("is-open");
     toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    // The header is `position: sticky`, so without this the dropdown stays
+    // pinned to the viewport while the page behind it keeps scrolling,
+    // making its solid background look like an empty void you have to
+    // scroll through before the real page content reappears underneath.
+    document.body.classList.toggle("nav-menu-open", isOpen);
   });
 }
 
