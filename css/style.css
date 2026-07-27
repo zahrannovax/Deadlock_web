@@ -1320,14 +1320,6 @@ body {
   object-fit: cover;
 }
 
-.preview-card figcaption {
-  padding: 16px 20px;
-  text-align: center;
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: var(--text-main);
-}
-
 /* -------------------------------------------------------------------------
    Pricing / plan badges
    ------------------------------------------------------------------------- */
