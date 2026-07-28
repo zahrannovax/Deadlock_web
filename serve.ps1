@@ -26,6 +26,7 @@ while ($listener.IsListening) {
             ".png" { "image/png" }
             ".webp" { "image/webp" }
             ".ico" { "image/x-icon" }
+            ".woff2" { "font/woff2" }
             ".svg" { "image/svg+xml" }
             ".mp4" { "video/mp4" }
             ".xml" { "application/xml" }
