@@ -316,15 +316,22 @@ function setupTiltCard(card) {
 
 /**
  * Nav language switcher, wired to Google's free client-side "Website
- * Translator" widget (loaded in each page's <body> as
- * #google_translate_element) so picking a language performs a real,
- * live machine translation of the page — not just a label change.
+ * Translator" widget (mount point: #google_translate_element) so picking
+ * a language performs a real, live machine translation of the page —
+ * not just a label change.
  *
  * How it actually drives translation: Google's widget reads a "googtrans"
  * cookie on page load to decide what to translate the page into. So
  * instead of talking to the hidden widget's internals directly (which is
  * flaky since Google re-renders it), we set that cookie ourselves and
  * reload the page; Google's script then auto-translates on the next load.
+ *
+ * The Translate script is NOT loaded on every page view. English visitors
+ * never pay for it. It is injected only when:
+ *   1. A non-English googtrans cookie is already set (returning visitor
+ *      who previously picked a language — required for the reload path), or
+ *   2. The visitor opens the language dropdown (warms the script up
+ *      before they pick, so the next reload is ready faster).
  *
  * Requires the page to be served over http(s) — Google's translate
  * service cannot be reached from a local file:// page, and only fully
@@ -333,6 +340,9 @@ function setupTiltCard(card) {
 function initLanguageSwitcher() {
   var COOKIE_NAME = "googtrans";
   var SOURCE_LANG = "en";
+  var TRANSLATE_SCRIPT_SRC =
+    "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+  var translateScriptRequested = false;
 
   // Our menu uses plain ISO codes; Google's cookie/widget expects a couple
   // of these in a more specific form (only Chinese differs here).
@@ -394,6 +404,42 @@ function initLanguageSwitcher() {
     window.location.reload();
   }
 
+  // Callback name Google's element.js invokes via ?cb=... Must live on
+  // window so the injected script can find it after it finishes loading.
+  window.googleTranslateElementInit = function () {
+    if (!window.google || !window.google.translate || !window.google.translate.TranslateElement) {
+      return;
+    }
+    new window.google.translate.TranslateElement(
+      {
+        pageLanguage: SOURCE_LANG,
+        includedLanguages: "en,de,fr,es,pt,ru,zh-CN,ja,ko,tr,pl,nl,it,ar,th,vi",
+        autoDisplay: false
+      },
+      "google_translate_element"
+    );
+  };
+
+  function loadGoogleTranslate() {
+    if (translateScriptRequested) {
+      return;
+    }
+    if (!document.getElementById("google_translate_element")) {
+      return;
+    }
+    translateScriptRequested = true;
+    var script = document.createElement("script");
+    script.src = TRANSLATE_SCRIPT_SRC;
+    script.async = true;
+    document.body.appendChild(script);
+  }
+
+  // Returning non-English visitors still need the widget on this load so
+  // the googtrans cookie can take effect after the previous reload.
+  if (getActiveLangCode() !== SOURCE_LANG) {
+    loadGoogleTranslate();
+  }
+
   var switchers = document.querySelectorAll(".lang-switcher");
 
   switchers.forEach(function (switcher) {
@@ -411,6 +457,10 @@ function initLanguageSwitcher() {
     }
 
     function openMenu() {
+      // Warm the Translate script when interest is shown, so a language
+      // pick + reload can apply faster. English-only visitors who never
+      // open the menu never download it.
+      loadGoogleTranslate();
       switcher.classList.add("is-open");
       button.setAttribute("aria-expanded", "true");
     }
