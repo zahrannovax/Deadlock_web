@@ -25,6 +25,7 @@ while ($listener.IsListening) {
             ".jpg" { "image/jpeg" }
             ".png" { "image/png" }
             ".webp" { "image/webp" }
+            ".ico" { "image/x-icon" }
             ".svg" { "image/svg+xml" }
             ".mp4" { "video/mp4" }
             ".xml" { "application/xml" }
@@ -38,6 +39,10 @@ while ($listener.IsListening) {
         $response.OutputStream.Write($bytes, 0, $bytes.Length)
     } else {
         $response.StatusCode = 404
+        $response.ContentType = "text/plain; charset=utf-8"
+        $msg = [System.Text.Encoding]::UTF8.GetBytes("404 Not Found: $path`n(Use this serve.ps1 server — Live Server cannot resolve clean URLs like /blog.)")
+        $response.ContentLength64 = $msg.Length
+        $response.OutputStream.Write($msg, 0, $msg.Length)
     }
     $response.OutputStream.Close()
 }
