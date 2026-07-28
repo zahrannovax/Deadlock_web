@@ -13,6 +13,9 @@ document.addEventListener("DOMContentLoaded", function () {
   initSmoothScroll();
 });
 
+/** Shared Lenis instance so the mobile menu can stop page scroll while open. */
+var lenisInstance = null;
+
 /**
  * Wires up Lenis (loaded from a CDN in <head>) for eased, momentum-style
  * scrolling instead of the browser's instant/linear scroll. Skipped
@@ -27,7 +30,7 @@ function initSmoothScroll() {
     return;
   }
 
-  var lenis = new window.Lenis({
+  lenisInstance = new window.Lenis({
     duration: 1.1,
     smoothWheel: true,
     autoRaf: true
@@ -47,7 +50,7 @@ function initSmoothScroll() {
         return;
       }
       event.preventDefault();
-      lenis.scrollTo(target, { offset: -84 });
+      lenisInstance.scrollTo(target, { offset: -84 });
     });
   });
 }
@@ -58,19 +61,41 @@ function initSmoothScroll() {
 function initMobileNav() {
   var toggle = document.querySelector(".nav-toggle");
   var nav = document.querySelector(".nav");
+  var scrollLockY = 0;
 
   if (!toggle || !nav) {
     return;
   }
 
-  toggle.addEventListener("click", function () {
-    var isOpen = nav.classList.toggle("is-open");
+  function setMenuOpen(isOpen) {
+    nav.classList.toggle("is-open", isOpen);
     toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    // The header is `position: sticky`, so without this the dropdown stays
-    // pinned to the viewport while the page behind it keeps scrolling,
-    // making its solid background look like an empty void you have to
-    // scroll through before the real page content reappears underneath.
+    document.documentElement.classList.toggle("nav-menu-open", isOpen);
     document.body.classList.toggle("nav-menu-open", isOpen);
+
+    // Lenis ignores body { overflow: hidden }, so without stop/start the
+    // sticky header stays put while Lenis keeps scrolling the page under
+    // it — that empty black void under the dropdown.
+    if (lenisInstance) {
+      if (isOpen) {
+        lenisInstance.stop();
+      } else {
+        lenisInstance.start();
+      }
+    }
+
+    // iOS Safari fallback when Lenis isn't active: freeze scroll position.
+    if (isOpen) {
+      scrollLockY = window.scrollY || window.pageYOffset || 0;
+      document.body.style.top = "-" + scrollLockY + "px";
+    } else {
+      document.body.style.top = "";
+      window.scrollTo(0, scrollLockY);
+    }
+  }
+
+  toggle.addEventListener("click", function () {
+    setMenuOpen(!nav.classList.contains("is-open"));
   });
 }
 

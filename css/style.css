@@ -587,12 +587,14 @@ ul {
   border-radius: 20px;
   box-shadow: 0 28px 64px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
   z-index: 1200;
+  /* display:none when closed is required: visibility/opacity alone still
+     lets this panel extend a parent overflow:auto scrollport (mobile nav),
+     which created the empty black scroll under "Purchase Now". */
+  display: none;
   opacity: 0;
-  visibility: hidden;
   pointer-events: none;
   transform: translateY(-8px) scale(0.98);
   transform-origin: top right;
-  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
 }
 
 .lang-switcher-menu::before {
@@ -610,8 +612,8 @@ ul {
 }
 
 .lang-switcher.is-open .lang-switcher-menu {
+  display: block;
   opacity: 1;
-  visibility: visible;
   pointer-events: auto;
   transform: translateY(0) scale(1);
 }
@@ -2336,19 +2338,35 @@ table.compare tr:last-child td {
     top: var(--header-height);
     left: 0;
     right: 0;
-    max-height: calc(100vh - var(--header-height));
+    /* Size to content — do not force a tall scrollport. overflow-y only
+       kicks in if the real menu items exceed the viewport (e.g. small
+       phones). */
+    height: auto;
+    max-height: calc(100dvh - var(--header-height));
+    overflow-x: hidden;
     overflow-y: auto;
     background-color: var(--bg-main);
     border-bottom: 1px solid var(--border-color);
+    -webkit-overflow-scrolling: touch;
   }
 
   /* Locks the page in place while the dropdown is open. Without this, the
      sticky header (and the dropdown hanging off it) stay pinned to the
      viewport while the page underneath keeps scrolling, so its solid
      background looks like a blank void you have to scroll through before
-     real content reappears beneath it. */
+     real content reappears beneath it. Lenis is also stopped in JS —
+     overflow alone is not enough when smooth-scroll is active. */
+  html.nav-menu-open,
   body.nav-menu-open {
     overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  body.nav-menu-open {
+    position: fixed;
+    width: 100%;
+    left: 0;
+    right: 0;
   }
 
   .nav.is-open .nav-links {
@@ -2385,9 +2403,21 @@ table.compare tr:last-child td {
   }
 
   .lang-switcher-menu {
-    right: auto;
-    left: 0;
-    width: 100%;
+    /* Fixed to the viewport on mobile so an open language list cannot
+       inflate .nav-menu's scrollHeight into empty black space. */
+    position: fixed;
+    top: auto;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    width: auto;
+    max-height: min(60dvh, 420px);
+    overflow: auto;
+    z-index: 1300;
+  }
+
+  .lang-switcher-menu::before {
+    display: none;
   }
 
   .grid-3,
