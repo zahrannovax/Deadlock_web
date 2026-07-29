@@ -89,6 +89,12 @@ html {
   scroll-behavior: smooth;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 /* -------------------------------------------------------------------------
    Page transitions (native View Transitions API, enabled via the
    <meta name="view-transition" content="same-origin"> tag in <head>).
@@ -120,7 +126,10 @@ body {
   font-family: "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
   line-height: 1.6;
-  overflow-x: hidden;
+  /* Use clip (not hidden): overflow-x:hidden forces overflow-y to compute
+     to auto, which creates a body scrollport and breaks Lenis smooth wheel
+     scrolling. clip clips horizontal overflow without that side effect. */
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
 }
 

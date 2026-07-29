@@ -16,41 +16,67 @@ document.addEventListener("DOMContentLoaded", function () {
 /** Shared Lenis instance so the mobile menu can stop page scroll while open. */
 var lenisInstance = null;
 
+/** Sticky header offset so in-page anchors aren't hidden under the nav. */
+var ANCHOR_SCROLL_OFFSET = 84;
+
 /**
- * Wires up Lenis (loaded from a CDN in <head>) for eased, momentum-style
- * scrolling instead of the browser's instant/linear scroll. Skipped
- * entirely for users who prefer reduced motion, and fails silently if the
- * Lenis script hasn't loaded (e.g. blocked by an ad-blocker/offline) so
- * the page still scrolls normally either way.
+ * Smooth scrolling for the whole page (wheel/trackpad via Lenis) and for
+ * internal #anchor links. Lenis is self-hosted at /js/lenis.min.js.
+ * Falls back to native window.scrollTo for anchors if Lenis is missing.
  */
 function initSmoothScroll() {
   var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  if (prefersReducedMotion || typeof window.Lenis !== "function") {
-    return;
+  if (!prefersReducedMotion && typeof window.Lenis === "function") {
+    lenisInstance = new window.Lenis({
+      duration: 1.4,
+      easing: function (t) {
+        return Math.min(1, 1.001 - Math.pow(2, -10 * t));
+      },
+      orientation: "vertical",
+      gestureOrientation: "vertical",
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 2,
+      autoRaf: false
+    });
+
+    // Drive Lenis each frame (explicit loop is more reliable than autoRaf alone).
+    function raf(time) {
+      lenisInstance.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
   }
 
-  lenisInstance = new window.Lenis({
-    duration: 1.1,
-    smoothWheel: true,
-    autoRaf: true
-  });
-
-  // Keep the nav's language dropdown, Discord popovers, etc. in sync while
-  // the page eases to an anchor link (e.g. the hero's "See preview images"
-  // pill) instead of jumping instantly past it.
   document.querySelectorAll('a[href^="#"]').forEach(function (link) {
     link.addEventListener("click", function (event) {
       var targetId = link.getAttribute("href");
       if (!targetId || targetId === "#") {
         return;
       }
+
       var target = document.querySelector(targetId);
       if (!target) {
         return;
       }
+
       event.preventDefault();
-      lenisInstance.scrollTo(target, { offset: -84 });
+
+      if (lenisInstance) {
+        lenisInstance.scrollTo(target, { offset: -ANCHOR_SCROLL_OFFSET });
+        return;
+      }
+
+      var top =
+        target.getBoundingClientRect().top +
+        (window.pageYOffset || document.documentElement.scrollTop) -
+        ANCHOR_SCROLL_OFFSET;
+
+      window.scrollTo({
+        top: Math.max(0, top),
+        behavior: prefersReducedMotion ? "auto" : "smooth"
+      });
     });
   });
 }
