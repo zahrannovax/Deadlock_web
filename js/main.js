@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Zadeyo Deadlock Cheats — Global Scripts
+   Deadlock Cheats — Global Scripts
    Mobile nav toggle + custom video play overlay + FAQ helpers.
    ========================================================================== */
 
