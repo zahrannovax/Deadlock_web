@@ -47,7 +47,7 @@ const ROOT_DIR = __dirname;
  */
 const PAGE_META = {
   "index.html": { priority: "1.0", changefreq: "weekly" },
-  "cs2-cheats.html": { priority: "0.9", changefreq: "weekly" },
+  "deadlock-cheats.html": { priority: "0.9", changefreq: "weekly" },
   "blog.html": { priority: "0.7", changefreq: "monthly" },
   "guide.html": { priority: "0.7", changefreq: "monthly" }
 };
